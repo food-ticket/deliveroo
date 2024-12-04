@@ -29,7 +29,7 @@ DELIVEROO_WEBHOOK_SECRET=
 
 ## Making requests
 ### Getting orders
-To get all orders from a store, you can use the following code:
+To get all orders from a restaurant, you can use the following code:
 ```php
 $deliverooApi = new DeliverooApi();
 $deliverooApi->getOrders($brandId, $restaurantId);
