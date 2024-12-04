@@ -1,0 +1,43 @@
+{
+    "name": "foodticket/deliveroo",
+    "description": "A PHP client to integrate with the Deliveroo API",
+    "keywords": ["Foodticket", "PHP", "Deliveroo", "delivery", "api client"],
+    "type": "library",
+    "require": {
+        "php": "^8.3",
+        "illuminate/http": "^11.0",
+        "illuminate/support": "^11.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Foodticket\\Deliveroo\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Foodticket",
+            "email": "developer@foodticket.nl"
+        },
+        {
+            "name": "Rik",
+            "email": "rik@foodticket.nl"
+        }
+    ],
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Foodticket\\Deliveroo\\DeliverooServiceProvider"
+            ]
+        }
+    }
+}
