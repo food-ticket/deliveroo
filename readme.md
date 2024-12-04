@@ -1,5 +1,5 @@
 # Implement the new Deliveroo API
-This package allows you to easily make requests to the new Deliveroo API.
+This package allows you to easily make requests to the new Deliveroo API. The full documentation of the Deliveroo API can be found here: https://api-docs.deliveroo.com/v2.0/reference/credentials.
 
 ## Requirements
 
