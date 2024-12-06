@@ -88,52 +88,6 @@ trait ManagesOrders
     }
 
     /**
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function acceptOrder(Order $order): Order
-    {
-        // We always accept the order, and then update the status to pending.
-        $response = $this->updateOrderStatus(
-            orderId: $order->source_info,
-            status: OrderStatus::ACCEPTED,
-        );
-
-        if (! $response->successful()) {
-            $response->throw();
-        }
-
-        return $order;
-    }
-
-    /**
-     * @see https://api-docs.deliveroo.com/v2.0/reference/patch-order-1
-     *
-     * @throws ConnectionException
-     */
-    public function updateOrderStatus(
-        string $orderId,
-        OrderStatus $status,
-        ?OrderRejectReason $rejectReason = null,
-        ?string $notes = null,
-    ): Response {
-        if (
-            $status === OrderStatus::REJECTED
-            && empty($rejectReason)
-        ) {
-            throw new Exception('Reject reason is required when status is rejected.');
-        }
-
-        $data = [
-            'status' => $status,
-            'reject_reason' => $rejectReason,
-            'notes' => $notes,
-        ];
-
-        return $this->request()->patch("/order/v1/orders/{$orderId}", $data);
-    }
-
-    /**
      * @see https://api-docs.deliveroo.com/v2.0/reference/create-sync-status-1
      *
      * @throws ConnectionException
@@ -161,6 +115,33 @@ trait ManagesOrders
         ];
 
         return $this->request()->post("/order/v1/orders/{$orderId}/sync_status", $data);
+    }
+
+    /**
+     * @see https://api-docs.deliveroo.com/v2.0/reference/patch-order-1
+     *
+     * @throws ConnectionException
+     */
+    public function updateOrderStatus(
+        string $orderId,
+        OrderStatus $status,
+        ?OrderRejectReason $rejectReason = null,
+        ?string $notes = null,
+    ): Response {
+        if (
+            $status === OrderStatus::REJECTED
+            && empty($rejectReason)
+        ) {
+            throw new Exception('Reject reason is required when status is rejected.');
+        }
+
+        $data = [
+            'status' => $status,
+            'reject_reason' => $rejectReason,
+            'notes' => $notes,
+        ];
+
+        return $this->request()->patch("/order/v1/orders/{$orderId}", $data);
     }
 
     /**
