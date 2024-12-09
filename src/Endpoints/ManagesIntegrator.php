@@ -25,7 +25,7 @@ trait ManagesIntegrator
 
         $data = $this->transformWebhookConfigurations($webhookConfigurations);
 
-        return $this->request()->put("/api/v1/integrator/brands/{$brandId}/sites-config", $data->toArray());
+        return $this->request()->put("/order/v1/integrator/brands/{$brandId}/sites-config", $data->toArray());
     }
 
     private function transformWebhookConfigurations(array $webhookConfigurations): Collection

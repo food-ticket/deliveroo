@@ -80,30 +80,11 @@ trait ManagesOrders
     {
         $response = $this->request()->get("/order/v2/orders/{$orderId}");
 
-        if ($response->successful()) {
-            return $response->object();
-        }
-
-        $response->throw();
-    }
-
-    /**
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function acceptOrder(Order $order): Order
-    {
-        // We always accept the order, and then update the status to pending.
-        $response = $this->updateOrderStatus(
-            orderId: $order->source_info,
-            status: OrderStatus::ACCEPTED,
-        );
-
         if (! $response->successful()) {
             $response->throw();
         }
 
-        return $order;
+        return $response->object();
     }
 
     /**
