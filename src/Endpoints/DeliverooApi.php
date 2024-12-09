@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 class DeliverooApi
 {
     use ManagesOrders;
+    use ManagesIntegrator;
 
     private string $baseUrl;
 
@@ -18,10 +19,6 @@ class DeliverooApi
 
     public function __construct()
     {
-        /**
-         * IMPORTANT!
-         * use the correct url, see @https://api-docs.deliveroo.com/v2.0/docs/api-and-webhooks
-         */
         $this->baseUrl = config('deliveroo.base_url');
         $this->authUrl = config('deliveroo.auth_url');
     }

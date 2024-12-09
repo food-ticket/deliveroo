@@ -8,8 +8,8 @@ use App\Models\Order;
 use Carbon\Carbon;
 use Exception;
 use Foodticket\Deliveroo\Enums\OrderRejectReason;
-use Foodticket\Deliveroo\Enums\OrderStatus;
 use Foodticket\Deliveroo\Enums\OrderStage;
+use Foodticket\Deliveroo\Enums\OrderStatus;
 use Foodticket\Deliveroo\Enums\OrderSyncStatus;
 use Foodticket\Deliveroo\Enums\Reason;
 use Illuminate\Http\Client\ConnectionException;
@@ -18,12 +18,12 @@ use Illuminate\Http\Client\Response;
 
 trait ManagesOrders
 {
-    const array ORDER_DELAY_OPTIONS = [0, 2, 4, 6, 8, 10];
+    public const array ORDER_DELAY_OPTIONS = [0, 2, 4, 6, 8, 10];
 
     /**
      * @see https://api-docs.deliveroo.com/v2.0/reference/get-orders-v2
      *
-     * @throws ConnectionException
+     * @throws ConnectionException|RequestException
      */
     public function getOrders(
         string $brandId,
@@ -54,27 +54,27 @@ trait ManagesOrders
 
         $response = $request->get("/order/v2/brand/{$brandId}/restaurant/{$restaurantId}/orders");
 
-        if ($response->successful()) {
-            $response = $response->json();
-
-            $results = [
-                'next' => $response['next'],
-            ];
-
-            $results['orders'] = collect($response['orders'])->map(function ($item) {
-                return (object) $item;
-            });
-
-            return (object) $results;
+        if (! $response->successful()) {
+            $response->throw();
         }
 
-        $response->throw();
+        $response = $response->json();
+
+        $results = [
+            'next' => $response['next'],
+        ];
+
+        $results['orders'] = collect($response['orders'])->map(function ($item) {
+            return (object) $item;
+        });
+
+        return (object) $results;
     }
 
     /**
      * @see https://api-docs.deliveroo.com/v2.0/reference/get-order-v2
      *
-     * @throws ConnectionException
+     * @throws ConnectionException|RequestException
      */
     public function getOrder(string $orderId): object
     {
@@ -85,6 +85,52 @@ trait ManagesOrders
         }
 
         $response->throw();
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function acceptOrder(Order $order): Order
+    {
+        // We always accept the order, and then update the status to pending.
+        $response = $this->updateOrderStatus(
+            orderId: $order->source_info,
+            status: OrderStatus::ACCEPTED,
+        );
+
+        if (! $response->successful()) {
+            $response->throw();
+        }
+
+        return $order;
+    }
+
+    /**
+     * @see https://api-docs.deliveroo.com/v2.0/reference/patch-order-1
+     *
+     * @throws ConnectionException
+     */
+    public function updateOrderStatus(
+        string $orderId,
+        OrderStatus $status,
+        ?OrderRejectReason $rejectReason = null,
+        ?string $notes = null,
+    ): Response {
+        if (
+            $status === OrderStatus::REJECTED
+            && empty($rejectReason)
+        ) {
+            throw new Exception('Reject reason is required when status is rejected.');
+        }
+
+        $data = [
+            'status' => $status,
+            'reject_reason' => $rejectReason,
+            'notes' => $notes,
+        ];
+
+        return $this->request()->patch("/order/v1/orders/{$orderId}", $data);
     }
 
     /**
@@ -118,33 +164,6 @@ trait ManagesOrders
     }
 
     /**
-     * @see https://api-docs.deliveroo.com/v2.0/reference/patch-order-1
-     *
-     * @throws ConnectionException
-     */
-    public function updateOrderStatus(
-        string $orderId,
-        OrderStatus $status,
-        ?OrderRejectReason $rejectReason = null,
-        ?string $notes = null,
-    ): Response {
-        if (
-            $status === OrderStatus::REJECTED
-            && empty($rejectReason)
-        ) {
-            throw new Exception('Reject reason is required when status is rejected.');
-        }
-
-        $data = [
-            'status' => $status,
-            'reject_reason' => $rejectReason,
-            'notes' => $notes,
-        ];
-
-        return $this->request()->patch("/order/v1/orders/{$orderId}", $data);
-    }
-
-    /**
      * @see https://api-docs.deliveroo.com/v2.0/reference/create-prep-stage-1
      *
      * @throws ConnectionException
@@ -153,7 +172,7 @@ trait ManagesOrders
         string $orderId,
         OrderStage $stage,
         Carbon $occurredAt,
-        int $delay = null,
+        ?int $delay = null,
     ): Response {
         if (
             $delay !== null
