@@ -38,11 +38,11 @@ class WebhookController extends Controller
 
     private function hasValidSignature(Request $request): bool
     {
-        $clientSecret = config('services.deliveroo.webhook_secret');
+        $clientSecret = config('deliveroo.webhook_secret');
         $signature = $request->header('X-Deliveroo-Hmac-Sha256');
         $sequenceGuid = $request->header('X-Deliveroo-Sequence-Guid');
 
-        $hash = hash_hmac('sha256', $sequenceGuid . ' ' . $request->getContent(), $clientSecret);
+        $hash = hash_hmac('sha256', $sequenceGuid.' '.$request->getContent(), $clientSecret);
 
         return hash_equals($signature, $hash);
     }
