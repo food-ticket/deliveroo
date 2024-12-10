@@ -35,7 +35,7 @@ trait ManagesBrands
     }
 
     /**
-     * @see https://api-docs.deliveroo.com/reference/put-sites-config
+     * @see https://api-docs.deliveroo.com/v2.0/reference/put-sites-config
      *
      * @throws ConnectionException
      */
