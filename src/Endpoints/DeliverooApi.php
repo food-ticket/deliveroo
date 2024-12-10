@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 class DeliverooApi
 {
     use ManagesOrders;
-    use ManagesIntegrator;
+    use ManagesBrands;
 
     private string $baseUrl;
 
