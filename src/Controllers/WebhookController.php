@@ -7,14 +7,15 @@ use Foodticket\Deliveroo\DeliverooWebhook;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
     public function handle(Request $request)
     {
-//        if (! $this->hasValidSignature($request)) {
-//            throw new Exception('Invalid signature', 401);
-//        }
+        if ($this->hasWebhookSecret() && ! $this->hasValidSignature($request)) {
+            throw new Exception('Invalid signature', 401);
+        }
 
         $webhook = $this->transformWebhookEvent($request);
 
@@ -38,12 +39,23 @@ class WebhookController extends Controller
 
     private function hasValidSignature(Request $request): bool
     {
-        $clientSecret = config('deliveroo.webhook_secret');
+        $webhookSecret = config('deliveroo.webhook_secret');
         $signature = $request->header('X-Deliveroo-Hmac-Sha256');
         $sequenceGuid = $request->header('X-Deliveroo-Sequence-Guid');
 
-        $hash = hash_hmac('sha256', $sequenceGuid.' '.$request->getContent(), $clientSecret);
+        $hash = hash_hmac('sha256', $sequenceGuid.' '.$request->getContent(), $webhookSecret);
 
         return hash_equals($signature, $hash);
+    }
+
+    private function hasWebhookSecret(): bool
+    {
+        if (empty(config('deliveroo.webhook_secret'))) {
+            Log::warning('Deliveroo webhook secret is not set and the webhook signature not validated.');
+
+            return false;
+        }
+
+        return true;
     }
 }
