@@ -32,9 +32,7 @@ class WebhookController extends Controller
 
     private function transformWebhookEvent(Request $request): DeliverooWebhook
     {
-        $payload = $request->all();
-
-        return DeliverooWebhook::fromWebhookEvent($payload);
+        return DeliverooWebhook::fromWebhookEvent($request->all(), $request->header());
     }
 
     private function hasValidSignature(Request $request): bool
