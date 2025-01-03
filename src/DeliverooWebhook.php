@@ -17,8 +17,9 @@ class DeliverooWebhook
         protected string $locationId,
         protected ?string $resourceId,
         protected array $payload,
+        protected array $headers,
     ) {
-        //        $this->hmacSignature = Arr::get($payload, 'additionalData.hmacSignature');
+        //
     }
 
     public function platform(): string
@@ -48,12 +49,12 @@ class DeliverooWebhook
         return $this->payload;
     }
 
-    //    public function hmacSignature(): string
-    //    {
-    //        return $this->hmacSignature;
-    //    }
+        public function headers(): string
+        {
+            return $this->headers;
+        }
 
-    public static function fromWebhookEvent(array $payload): self
+    public static function fromWebhookEvent(array $payload, array $headers): self
     {
         $locationId = Arr::get($payload, 'body.order.location_id');
         $resourceId = Arr::get($payload, 'body.order.id');
@@ -62,7 +63,8 @@ class DeliverooWebhook
             $payload['event'],
             $locationId,
             $resourceId,
-            $payload
+            $payload,
+            $headers
         );
     }
 }
