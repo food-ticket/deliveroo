@@ -49,7 +49,7 @@ class DeliverooWebhook
         return $this->payload;
     }
 
-        public function headers(): string
+        public function headers(): array
         {
             return $this->headers;
         }
