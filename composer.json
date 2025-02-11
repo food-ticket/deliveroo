@@ -21,11 +21,13 @@
             "Tests\\": "tests"
         }
     },
-    "license": "MIT",
+    "license": "GPL-3.0-only",
     "authors": [
         {
             "name": "Foodticket",
-            "email": "developer@foodticket.nl"
+            "email": "developer@foodticket.nl",
+            "homepage": "https://foodticket.nl",
+            "role": "Developer"
         },
         {
             "name": "Rik",
