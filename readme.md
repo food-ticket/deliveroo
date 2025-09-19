@@ -3,7 +3,7 @@ This package allows you to easily make requests to the new Deliveroo API. The fu
 
 ## Requirements
 
-- PHP >= 8.3
+- PHP >= 8.2
 - Laravel >= 11.0
 
 ## Installation
