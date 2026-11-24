@@ -13,7 +13,7 @@ class WebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        if ($this->hasWebhookSecret() && ! $this->hasValidSignature($request)) {
+        if (! $this->hasValidSignature($request)) {
             throw new Exception('Invalid signature', 401);
         }
 
@@ -44,16 +44,5 @@ class WebhookController extends Controller
         $hash = hash_hmac('sha256', $sequenceGuid.' '.$request->getContent(), $webhookSecret);
 
         return hash_equals($signature, $hash);
-    }
-
-    private function hasWebhookSecret(): bool
-    {
-        if (empty(config('deliveroo.webhook_secret'))) {
-            Log::warning('Deliveroo webhook secret is not set and the webhook signature not validated.');
-
-            return false;
-        }
-
-        return true;
     }
 }
